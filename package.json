@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "iij-eng-blog-20160411",
+  "version": "0.1.0",
+  "description": "IIJエンジニアブログ「ドキュメントの継続的な開発方法」のデモ",
+  "main": "index.js",
+  "scripts": {
+    "test": "textlint source/"
+  },
+  "keywords": [
+    "iij",
+    "reStructuredText",
+    "sphinx",
+    "textlint"
+  ],
+  "author": "yosinobu",
+  "license": "MIT",
+  "devDependencies": {
+    "textlint": "^6.3.0",
+    "textlint-plugin-rst": "^0.1.1",
+    "textlint-rule-preset-jtf-style": "^2.1.2"
+  }
+}
