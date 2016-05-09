@@ -1,10 +1,23 @@
 sudo: required
 language: node_js
 node_js:
-  - "stable"
+  - stable
 python:
   - "2.7"
+env:
+  global:
+    - GH_REPO: "github.com/iij/eng-blog-20160531.git"
+    - secure: ""
 install:
   - sudo pip install -U pip
   - sudo pip install -r requirements.txt
   - npm install
+script:
+  - sphinx-build -W -b html source/ build/
+  - npm test
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master

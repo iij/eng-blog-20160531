@@ -1,11 +1,12 @@
 {
   "private": true,
-  "name": "iij-eng-blog-20160411",
+  "name": "iij-eng-blog-20160531",
   "version": "0.1.0",
-  "description": "IIJエンジニアブログ「ドキュメントの継続的な開発方法」のデモ",
+  "description": "IIJエンジニアブログ「ドキュメントの継続的な開発方法」",
   "main": "index.js",
   "scripts": {
-    "test": "textlint source/"
+    "test": "textlint source/",
+    "clean": "make clean"
   },
   "keywords": [
     "iij",
@@ -18,6 +19,9 @@
   "devDependencies": {
     "textlint": "^6.3.0",
     "textlint-plugin-rst": "^0.1.1",
+    "textlint-rule-max-ten": "^2.0.1",
+    "textlint-rule-no-double-negative-ja": "^1.0.3",
+    "textlint-rule-no-mix-dearu-desumasu": "^1.4.0",
     "textlint-rule-preset-jtf-style": "^2.1.2"
   }
 }
