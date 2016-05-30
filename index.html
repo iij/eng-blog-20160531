@@ -1,0 +1,455 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ドキュメントの継続的な開発方法 &mdash; IIJ Engineers Blog 2016-05-31 Demo 0.1.0 ドキュメント</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="IIJ Engineers Blog 2016-05-31 Demo 0.1.0 ドキュメント" href="#"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> IIJ Engineers Blog 2016-05-31 Demo
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ドキュメントの継続的な開発方法</a><ul>
+<li><a class="reference internal" href="#id2">ドキュメントも開発対象？</a></li>
+<li><a class="reference internal" href="#id3">ドキュメントのファイル形式</a></li>
+<li><a class="reference internal" href="#web">Webマニュアルの作成環境</a><ul>
+<li><a class="reference internal" href="#virtualenv">Virtualenv を利用した環境構築の例</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">バージョン管理</a></li>
+<li><a class="reference internal" href="#ci">継続的インテグレーション（CI）</a></li>
+<li><a class="reference internal" href="#id5">マニュアル作成/公開フロー</a></li>
+<li><a class="reference internal" href="#textlint">textlintを使用した文章校正と自動テスト</a><ul>
+<li><a class="reference internal" href="#id7">導入効果</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">まとめ</a></li>
+<li><a class="reference internal" href="#url">参考URL</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">IIJ Engineers Blog 2016-05-31 Demo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>ドキュメントの継続的な開発方法</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>ドキュメントの継続的な開発方法<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>はじめまして、分散システム技術課の藤本です。</p>
+<p>私はソフトウェア開発を主体とするエンジニアで、</p>
+<ul class="simple">
+<li>クラウドサービスの開発・運用</li>
+<li>分散処理技術の検証とサービス利用の検討</li>
+<li>社内の開発支援環境の開発・運用</li>
+</ul>
+<p>などの業務に従事していますが、今回の記事は業務とは直接的な関係は無く、私が会社で勝手^H^H自発的に行っている取り組みについて書きたいと思います。</p>
+<p>昨今、インターネットは生活に深く浸透し、クラウドサービスを利用することで安く簡単にWebサービスを開発、公開できるようになりました。
+Web技術の進化や流行の移り変りも非常に激しく、既存サービスの機能追加や新規サービスの開発は頻繁に行われています。それは弊社も例外ではありません。</p>
+<p>このような開発の現場では、リーンソフトウェア開発への取り組みなど開発手法の最適化が積極的に行われ、様々なベストプラクティスが生みだされています。
+それらのベストプラクティスには、 <strong>継続的インテグレーション</strong> や <strong>継続的デプロイメント</strong> というものがあり、これらの自動化を行うことにより、</p>
+<ul class="simple">
+<li>開発に集中することができる</li>
+<li>テストによって一定の品質を継続的に確保し易くなる</li>
+<li>人的なミスを防ぎ易くなる</li>
+</ul>
+<p>というような多くのメリットを享受する事ができます。</p>
+<p>これらのメリットは開発者の生産性向上に大きく寄与する事から、現在では自動テストや自動デプロイは当り前になりつつあります。
+ソフトウェア開発においては既に語り尽されていると思いますので、今回は <strong>自然言語で書かれたドキュメントに対する同じような最適化の手法</strong> についてご紹介したいと思います。</p>
+<div class="section" id="id2">
+<h2>ドキュメントも開発対象？<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>どのような開発手法でも、仕様書や利用者向けのマニュアルなど自然言語で書かれた <strong>ドキュメント</strong> は必ず作成すると思います。</p>
+<p>それらのドキュメントもソースコードと同様に成果物の1つですから、機能の追加開発など行う際には開発対象の1つとしてドキュメントを考慮する必要があります。
+仕様書とソースコードのギャップは開発者を混乱させますし、マニュアルが間違っていると利用者はそのソフトウェアやサービスに対して不信感を抱きます。</p>
+<p>従って、 <strong>ドキュメントもソースコードと同様に適切に管理し、開発していく必要があります。</strong></p>
+<p>（…と偉そうなことを書いていますが、私は文章を書くのがすごく苦手なので、ちゃんと実践できているかどうか…正確に伝わる文章を書くのは本当に難しいです）</p>
+</div>
+<div class="section" id="id3">
+<h2>ドキュメントのファイル形式<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>かつてドキュメントといえばMicrosoftのOffice製品を使うことが多かったと思いますが、
+最近では <a class="reference external" href="http://daringfireball.net/projects/markdown/">Markdown</a> や <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText（reST）</a> のような <strong>軽量マークアップ言語</strong> を利用するケースも増えてきていると思います。</p>
+<p>軽量マークアップ言語を用いたドキュメント作成の大きな特徴として、以下のものが挙げられます。</p>
+<ul class="simple">
+<li>プレーンテキストである（シンプルなテキストエディタで編集できる）</li>
+<li>PDFやHTML形式に変換することができる</li>
+<li>特別な変換を行わなくても可読性が高い</li>
+<li>それぞれの記法を使うことでワープロソフトに近い柔軟な表現もできる</li>
+</ul>
+<p>加えて、軽量マークアップ言語を用いたドキュメントはプレーンテキストなので <strong>バージョン管理システム</strong> と相性が良く、
+バージョン管理のメリットとそれらのレポジトリと連携する <a class="reference external" href="https://github.com">Github</a> や <a class="reference external" href="https://trac.edgewall.org/">Trac</a> などの開発を支援するサービスやツールのメリットを最大限に享受することができます。</p>
+<p>以上のような事から、私の所属するチームでは利用者向けのWebマニュアルを作成/公開に <a class="reference external" href="http://www.sphinx-doc.org/ja/stable/">Sphinx</a> を活用しています。
+以降では、このWebマニュアルの作成を例に具体的なドキュメントを開発方法をご紹介したいと思います。</p>
+</div>
+<div class="section" id="web">
+<h2>Webマニュアルの作成環境<a class="headerlink" href="#web" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>前述のとおり <a class="reference external" href="http://www.sphinx-doc.org/ja/stable/">Sphinx</a> を使用したドキュメントの作成環境をご紹介します。</p>
+<p>Sphinxのインストール方法は <a class="reference external" href="http://sphinx-users.jp/gettingstarted/">Sphinxをはじめよう</a> に分かりやすくまとまっています。
+また、 <a class="reference external" href="https://virtualenv.pypa.io/en/latest/">Virtualenv</a> という仮想的なPythonの実行環境を作成するツールを使用することで、システム共通の実行環境を汚すことなくSphinxをインストールすることができます。</p>
+<div class="section" id="virtualenv">
+<h3>Virtualenv を利用した環境構築の例<a class="headerlink" href="#virtualenv" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><a class="reference external" href="https://pypi.python.org/pypi/pip">pip</a> というパッケージ管理ツールと <a class="reference external" href="https://virtualenv.pypa.io/en/latest/">Virtualenv</a> を事前にインストールした状態で以下のようにコマンドを実行します。</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> your_document_directory
+$ virtualenv .
+$ <span class="nb">source</span> bin/activate
+</pre></div>
+</div>
+<p>上記を実行することで仮想的なPythonの実行環境が作成され、その環境を利用可能な状態になります。</p>
+<p>次に、pipを使用してSphinxやそれに付随するライブラリをインストールします。
+pipにはインストールしているライブラリの一覧出力（ <code class="docutils literal"><span class="pre">pip</span> <span class="pre">freeze</span> <span class="pre">-l</span> <span class="pre">&gt;</span> <span class="pre">FILE</span></code> ）とその出力を指定して一括でインストール（ <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">FILE</span></code> ）する方法が用意されていますので、
+以下のような依存ライブラリの定義ファイル（ <code class="docutils literal"><span class="pre">requirements.txt</span></code> ）を用意しておくことで、簡単に環境を作ることができます。</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ pip install sphinx docutils-ast-writer
+$ pip freeze -l &gt; requirements.txt
+</pre></div>
+</div>
+<p>（※以下は、2016年03月31日時点でのSphinxとその依存ライブラリです。試す場合には最新のもののご利用をお勧めします）</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>alabaster==0.7.7
+Babel==2.2.0
+docutils==0.12
+docutils-ast-writer==0.1.0
+imagesize==0.7.0
+Jinja2==2.8
+MarkupSafe==0.23
+Pygments==2.1.3
+pytz==2016.3
+six==1.10.0
+snowballstemmer==1.2.1
+Sphinx==1.4
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">参考</p>
+<p>新しく環境を作成する場合には、以下を実行することで簡単に作ることができます。</p>
+<div class="last highlight-bash"><div class="highlight"><pre><span></span>$ pip install -r requirements.txt
+</pre></div>
+</div>
+</div>
+<p>以上でSphinxを利用するための環境が整いました。次に、以下のようにSphinxのプロジェクトを作成します。</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sphinx-quickstart
+</pre></div>
+</div>
+<p>コマンドを実行すると対話型のプロジェクト初期設定が始まるので、ここで設定を行います。（よくわからなければデフォルトで問題ないと思います）</p>
+<p>プロジェクトの初期化処理が終了すると <em>Makefile</em> および <em>make.bat</em> ファイルが生成されるので、以下のように <code class="docutils literal"><span class="pre">make</span></code> コマンドを実行する事により、
+初期化時に指定したビルドディレクトリ（デフォルトでは <code class="docutils literal"><span class="pre">_build/</span></code> ）配下にHTMLが生成されます。</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ make html
+</pre></div>
+</div>
+<p>以上が <a class="reference external" href="https://virtualenv.pypa.io/en/latest/">Virtualenv</a> を利用した <a class="reference external" href="http://www.sphinx-doc.org/ja/stable/">Sphinx</a> のドキュメント作成環境を作る手順です。</p>
+<p>あとは、reSTの記述 → <code class="docutils literal"><span class="pre">make</span></code> の実行 → 確認のサイクルの繰り返しになります。</p>
+<a class="reference internal image-reference" href="_images/sphinx-writing-cycle.png"><img alt="_images/sphinx-writing-cycle.png" src="_images/sphinx-writing-cycle.png" style="width: 800px;" /></a>
+<dl class="docutils">
+<dt>reSTの記法については、以下のサイトに分かりやすくまとまっていますのでご参照ください。</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="http://docs.sphinx-users.jp/rest.html">reStructuredText入門 - Sphinx 1.4 ドキュメント</a></li>
+<li><a class="reference external" href="http://sphinx-users.jp/reverse-dict/index.html">逆引き辞典 - Python製ドキュメンテーションビルダー、Sphinxの日本ユーザ会</a></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">複数のVirtualenv環境を使い分ける場合は <a class="reference external" href="https://virtualenvwrapper.readthedocs.org/en/latest/">Virtualenvwrapper</a> を利用すると管理しやすくなります。</p>
+</div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>バージョン管理<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>前述の通り、reSTなどの軽量マークアップ言語で記述したドキュメントはプレーンテキストなので、
+<a class="reference external" href="https://git-scm.com/">Git</a> や <a class="reference external" href="http://subversion.apache.org/">Subversion</a> などのバージョン管理システムと相性が良いです。</p>
+<p>バージョン管理システムを利用することで、変更点の確認や切り戻しが簡単にできるようになるだけで無く、
+自動テストや自動デプロイ、以下で紹介する <a class="reference external" href="https://github.com">Github</a> を利用した開発フロー構築の足掛りとなります。</p>
+<p>IIJではGithub Enterpriseを導入しており、私の所属チームでもGitでバージョン管理を行っているので、
+以降の説明では <strong>Githubの機能を利用した管理方法</strong> を紹介します。</p>
+</div>
+<div class="section" id="ci">
+<h2>継続的インテグレーション（CI）<a class="headerlink" href="#ci" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>個人的な体験として、reSTのドキュメントをチームで書いていた時に
+「構文チェックを行わずに <code class="docutils literal"><span class="pre">git</span> <span class="pre">push</span></code> （リモートブランチに適用）してしまい、 <a class="reference external" href="http://www.sphinx-doc.org/ja/stable/">Sphinx</a> でビルドを行う際にシンタックスエラーが発生してしまう」
+という状況に何度も遭遇しました。</p>
+<p>シンタックスエラーが発生する度にどのコミットでエラーになったのかを確認するのは大変ですし、デプロイを自動化するには少なくともシンタックスエラーを検出することは必要です。</p>
+<p>そこで私のチームでは、Githubと連携する <a class="reference external" href="https://github.com/drone/drone">Drone</a> というオープンソースのCIツールを利用して、自動的にシンタックスを検査するようにしました。
+Sphinxには <code class="docutils literal"><span class="pre">sphinx-build</span></code> コマンドの <code class="docutils literal"><span class="pre">-W</span></code> オプションを付けることで警告レベルの問題もエラーとして扱うようになり、CIツールからシンタックスエラーを検出できるようになります。</p>
+<p>Droneを使用する場合は、drone.yml というファイルを追加し、Droneの管理画面からレポジトリを登録することでGithubと連携して動作するようになります。</p>
+<p>以下は、Droneの設定ファイル（.drone.yml）の記述例です。</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">image</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">centos6</span>
+<span class="l l-Scalar l-Scalar-Plain">script</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">pip install -r requirements.txt</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sphinx-build -W -b html source/ build/</span>
+</pre></div>
+</div>
+<p>インターネットからアクセスできる環境でしたら <a class="reference external" href="https://drone.io/">drone.io</a> や <a class="reference external" href="https://travis-ci.org/">Travis CI</a> などのCIサービスを利用することもできます。</p>
+</div>
+<div class="section" id="id5">
+<h2>マニュアル作成/公開フロー<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference external" href="https://github.com">Github</a> のPull Requestの仕組みを使うことで綺麗なフローを構築することができると思います。</p>
+<p>以下は、私のチームで採用しているマニュアルの作成・変更から公開までのフローです。</p>
+<a class="reference internal image-reference" href="_images/flow.png"><img alt="_images/flow.png" src="_images/flow.png" style="width: 500px;" /></a>
+<p>ブランチの構成は以下の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">ブランチ名</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>master</td>
+<td><div class="first last line-block">
+<div class="line">公開中のマニュアル</div>
+<div class="line">masterにマージされたものは自動的に本番環境にデプロイして公開</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td>develop</td>
+<td><div class="first last line-block">
+<div class="line">査読済みのマニュアル</div>
+<div class="line">ステージングの公開サーバに自動的にデプロイし、最終確認を終えたらmasterにPull Requestを出す</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td>&lt;topic name&gt;</td>
+<td><div class="first last line-block">
+<div class="line">マニュアルの作成、修正時に作成するトピックブランチ</div>
+<div class="line">developブランチにPull Requestを出す</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="textlint">
+<h2>textlintを使用した文章校正と自動テスト<a class="headerlink" href="#textlint" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<a class="reference internal image-reference" href="_images/textlint.png"><img alt="_images/textlint.png" src="_images/textlint.png" style="width: 800px;" /></a>
+<p>弊社にはIIJ表記ガイドラインというドキュメントを書く際の表記ルールがあり、社外に公開するドキュメントはその表記ルールに準ずる必要がありますが、
+この表記ルールは量が多く詳細なため一人一人が全てのルールを把握することは難しく、表記ルールを確認しながらドキュメントを書くのは非効率です。</p>
+<p>そこで、自然言語もチェックすることができる <a class="reference external" href="https://github.com/textlint">textlint</a> という文章校正ツールを利用し、文章チェックの自動化を試みています。</p>
+<p>textlintはMarkdownやHTMLなどの形式にデフォルトで対応し、また他のテキスト形式のサポートや文章の検査内容の定義（ルール）をプラグイン形式で自由に追加することができるなど、非常に高い柔軟性が特徴のツールです。</p>
+<p>執筆時点での最新バージョンは <em>v6.6.0</em> ですが、頻繁に新しいバージョンがリリースされており開発の活発さが伺えます。
+<em>v6.0.0</em> からは実験的な機能だった自動修正が正式にサポートされ、機械的に修正可能なところは自動的に修正することができるようになりました。
+従来は既存ドキュメントへの適用に際して手動で修正が必要な点が手間となっていましたが、
+この機能の正式サポートにより修正作業まで自動化が可能になったため、導入のメリットが一段と向上しています。</p>
+<p>textlintのルールは、 <a class="reference external" href="http://eslint.org/">ESLint</a> や <a class="reference external" href="https://babeljs.io/">Babel</a> などで採用されているプラグインモデルを採用しており、
+小さくシンプルなルールを組み合わせて使う設計となっているので高い再利用性と柔軟性を持つ一方で、
+プリセット（preset）という仕組みにより簡便な導入が可能になっています。</p>
+<p>そのプリセットは予めいくつか用意されており、その内の1つの <a class="reference external" href="https://github.com/azu/textlint-rule-preset-JTF-style">textlint-rule-preset-JTF-style</a> は <a class="reference external" href="https://www.jtf.jp/jp/style_guide/styleguide_top.html">JTF日本語標準スタイルガイド（翻訳用）</a> の一部をルール化したもので、
+技術系の文書はこのプリセットで大半がカバーされていると思います。私自身はこのプリセットを包含する形でIIJ用のプリセットを作成しています。</p>
+<p>reSTファイルへの適用には <a class="reference external" href="https://www.npmjs.com/package/textlint-plugin-rst">textlint-plugin-rst</a> というプラグインが必要ですが、
+これを導入する事で前述のSphinxを利用したドキュメント作成環境でtextlintの利用が可能になります。
+なお、 textlint-plugin-rstは現在のバージョンではPythonの <a class="reference external" href="https://pypi.python.org/pypi?name=docutils-ast-writer&amp;version=0.1.0&amp;:action=display">docutils-ast-writer</a> というライブラリが必要なので以下のようにインストールしておく必要があります。</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ pip install --upgrade docutils-ast-writer
+$ npm install textlint textlint-plugin-rst
+</pre></div>
+</div>
+<p>また <a class="reference external" href="https://github.com/textlint/textlint/wiki/Collection-of-textlint-rule">公開されているルール</a> を使う場合は、以下のようにインストールして利用することができます。</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ npm install textlint-rule-max-ten textlint-rule-preset-jtf-style
+$ <span class="k">$(</span>npm bin<span class="k">)</span>/textlint --plugin rst --rule max-ten --preset textlint-rule-preset-jtf-style &lt;reST file&gt;
+</pre></div>
+</div>
+<p>これをCIツールなどを利用してテストを自動化することで、ソフトウェア開発と同じように継続的なドキュメントの開発をすることができます。</p>
+<div class="admonition seealso">
+<p class="first admonition-title">参考</p>
+<p>このような文字校正ツールはtextlintの他に <a class="reference external" href="http://redpen.cc/">RedPen</a> というJava製のツールもあります。</p>
+<p>RedPenはtextlintと同様に拡張性が高く、標準で対応するフォーマットがや周辺ツール、サポートするテキストエディタも豊富なので、
+検査内容や動作させる環境などに合わせて使い分けるのが良いと思います。</p>
+<p class="last">Gihyo.jpの連載「 <a class="reference external" href="http://gihyo.jp/lifestyle/serial/01/redpen">RedPenを使って技術文書を手軽に校正しよう</a> 」で導入方法からRedPenの内部の解説まで非常に詳しく説明されています。</p>
+</div>
+<div class="section" id="id7">
+<h3>導入効果<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>textlintは、 <a class="reference external" href="https://atom.io/">Atom</a> や <a class="reference external" href="https://www.gnu.org/software/emacs/">GNU Emacs</a> などのテキストエディタと連携し、
+文章を書きながらリアルタイムにチェックすることができます。
+それにより問題箇所があれば即座にフィードバックが得られるため、使っているうちに正しい文章の書き方が自然と身に付きます。</p>
+<p>さらに、CIツールを利用した継続的なテストを行うことで一定の品質を保つことができ、新たなルールを追加していくことでドキュメントを洗練させていくことができます。
+追加するルールは <a class="reference external" href="https://github.com/takuyaa/kuromoji.js">kuromoji.js</a> を使用することで形態素解析を行い、誤字の検出や品詞別のルールなど細かいチェックを実現することもできます。</p>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>まとめ<a class="headerlink" href="#id8" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>今回は、ドキュメントの継続的な開発方法として</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.sphinx-doc.org/ja/stable/">Sphinx</a> を使用したドキュメント作成</li>
+<li><a class="reference external" href="https://github.com/textlint">textlint</a> を使用した文章のチェック</li>
+<li><a class="reference external" href="https://github.com">Github</a> と <a class="reference external" href="https://github.com/drone/drone">Drone</a> や <a class="reference external" href="https://travis-ci.org/">Travis CI</a> を利用した継続的なテスト</li>
+</ul>
+<p>を紹介しました。具体例として、本記事のソースコードを公開していますので参考にしていただければ幸いです。</p>
+<p><a class="reference external" href="https://github.com/iij/eng-blog-20160531">https://github.com/iij/eng-blog-20160531</a></p>
+</div>
+<div class="section" id="url">
+<h2>参考URL<a class="headerlink" href="#url" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://azu.gitbooks.io/nodefest-technical-writing/content/">技術文書をソフトウェア開発する話</a></li>
+<li><a class="reference external" href="http://gihyo.jp/lifestyle/serial/01/redpen">RedPenを使って技術文書を手軽に校正しよう</a></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Internet Initiative Japan Inc..
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/translations.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
